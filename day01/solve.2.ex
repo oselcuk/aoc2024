@@ -1,0 +1,10 @@
+[l, r] = IO.stream()
+|> Enum.map(&String.split/1)
+|> Enum.map(fn l -> Enum.map(l, &String.to_integer/1) |> List.to_tuple end)
+|> Enum.unzip()
+|> Tuple.to_list()
+|> Enum.map(&Enum.frequencies/1)
+
+Enum.map(l, fn {k, v} -> v * k * Map.get(r, k, 0) end)
+|> Enum.sum()
+|> IO.inspect()
