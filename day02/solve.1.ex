@@ -1,11 +1,8 @@
 defmodule Solution do
-  # pairwise = fn enumerable -> Enum.scan(enumerable, {:sentinel, :sentinel}, fn element, {_, last} -> {last, element} end) |> Enum.drop(1) end
-  # str_to_int_list = fn s -> String.split(s) |> Enum.map(&String.to_integer/1) end
-
   def pairwise(enumerable) do
     enumerable
-    |> Enum.scan({:sentinel, :sentinel}, fn element, {_, last} -> {last, element} end)
-    |> Enum.drop(1)
+    |> Stream.chunk_every(2, 1, :discard)
+    |> Stream.map(&List.to_tuple/1)
   end
 
   def safe(nums, dampener \\ true) do
@@ -14,7 +11,6 @@ defmodule Solution do
       |> pairwise()
       |> Enum.map(fn {l, r} -> l - r end)
 
-    # IO.inspect(diffs)
     valid =
       Enum.all?(diffs, &(abs(&1) < 4)) and
         pairwise(diffs) |> Enum.all?(fn {l, r} -> l * r > 0 end)
