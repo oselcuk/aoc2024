@@ -25,11 +25,29 @@ defmodule Solution do
 end
 
 obstacles =
-  for line <- IO.stream() |> Stream.take(1024),
+  for line <- IO.stream(),
       line = String.trim(line),
       line != "",
       [a, b] = String.split(line, ",") |> Enum.map(&String.to_integer/1),
-      into: MapSet.new(),
       do: {a, b}
 
-obstacles |> Solution.solve() |> IO.inspect()
+{initial, [first | rest]} = Enum.split(obstacles, 1024)
+obstacles = MapSet.new(initial)
+
+obstacles |> Solution.solve() |> IO.inspect(label: "Part 1")
+
+Stream.scan(rest, {first, obstacles}, fn obstacle, {_, obstacles} ->
+  obstacles = MapSet.put(obstacles, obstacle)
+
+  if Solution.solve(obstacles) == nil do
+    {obstacle, obstacles}
+  else
+    {nil, obstacles}
+  end
+end)
+|> Stream.drop_while(&(elem(&1, 0) == nil))
+|> Stream.take(1)
+|> Enum.to_list()
+|> hd()
+|> elem(0)
+|> IO.inspect("Part 2")
